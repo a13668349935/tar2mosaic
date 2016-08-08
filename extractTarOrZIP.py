@@ -16,9 +16,9 @@ if __name__ == "__main__":
     # ******************************************************************************
     # basicPath= r"F:\Temp"														#**
     #imageFolder = "extract_gf_metadata.in"										#**
-    rootFolder = r"D:\baiduyun\test"  #存放压缩文件的根目录							#**
-    targetRoot = r"D:\baiduyun\test"  #输出解压后的跟目录				#**
-    resultMosiac = "D:\\baiduyun\\test.gdb\\test"
+    rootFolder = r"F:\Temp\Data\GF1"  #存放压缩文件的根目录							#**
+    targetRoot = r"F:\Temp\extract_gf_metadata.out"  #输出解压后的跟目录				#**
+    resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\test"
     #******************************************************************************
 
 
@@ -57,6 +57,90 @@ if __name__ == "__main__":
         rasterInfo[6]=raster.meanCellWidth
         rasterInfo[7]=raster.meanCellHeight
         return rasterInfo
+    def getGF1PointInfo(xmlFile):
+        root= ElementTree.parse(xmlFile)
+        pointInfo= range(0,8)
+        pointInfo[0]=float(root.find("TopLeftLongitude").text)
+        pointInfo[1]=float(root.find("TopLeftLatitude").text)
+        pointInfo[2]=float(root.find("TopRightLongitude").text)
+        pointInfo[3]=float(root.find("TopRightLatitude").text)
+        pointInfo[4]=float(root.find("BottomLeftLongitude").text)
+        pointInfo[5]=float(root.find("BottomLeftLatitude").text)
+        pointInfo[6]=float(root.find("BottomRightLongitude").text)
+        pointInfo[7]=float(root.find("BottomRightLatitude").text)
+        return pointInfo
+    def getGF1MetaInfo(xmlFile, tarFilePath):
+        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
+            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
+             'Scene Path','Scene Row','GroupName',row col bands format pixelType size sacle '''
+        xx = ElementTree.parse(xmlFile)
+        metaInfo=range(0,23)
+        metaInfo[0]=xx.find("ProductLevel").text
+        metaInfo[1]=xx.find("SatelliteID").text
+        metaInfo[2]=xx.find("SensorID").text
+        metaInfo[3]=xx.find("ReceiveTime").text
+        metaInfo[4]=xx.find("OrbitID").text
+        metaInfo[5]=xx.find("SolarZenith").text
+        metaInfo[6]=xx.find("SolarAzimuth").text
+        metaInfo[7]=xx.find("SatelliteAzimuth").text
+        metaInfo[8]=xx.find("SatelliteZenith").text
+        metaInfo[9]=xx.find("CloudPercent").text
+        metaInfo[10]=None
+        metaInfo[11]="Compressed"
+        metaInfo[12]=tarFilePath
+        metaInfo[13]=xx.find("ScenePath").text
+        metaInfo[14]=xx.find("SceneRow").text
+        metaInfo[15]=""
+        metaInfo[16]=xx.find("HeightInPixels").text
+        metaInfo[17]=xx.find("WidthInPixels").text
+        metaInfo[18]=xx.find("Bands").text
+        metaInfo[19]='GEOTIFF'
+        metaInfo[20]= 'unknow' #xx.find("PixelByte").text
+        metaInfo[21]=os.path.getsize(tarFilePath)
+        metaInfo[22]= 0 #(float(xx.find("ImageGSD").find("Line").text)+float(xx.find("ImageGSD").find("Sample").text))/2.0
+        return metaInfo
+    def getGF2PointInfo(xmlFile):
+        root= ElementTree.parse(xmlFile)
+        pointInfo= range(0,8)
+        pointInfo[0]=float(root.find("TopLeftLongitude").text)
+        pointInfo[1]=float(root.find("TopLeftLatitude").text)
+        pointInfo[2]=float(root.find("TopRightLongitude").text)
+        pointInfo[3]=float(root.find("TopRightLatitude").text)
+        pointInfo[4]=float(root.find("BottomLeftLongitude").text)
+        pointInfo[5]=float(root.find("BottomLeftLatitude").text)
+        pointInfo[6]=float(root.find("BottomRightLongitude").text)
+        pointInfo[7]=float(root.find("BottomRightLatitude").text)
+        return pointInfo
+    def getGF2MetaInfo(xmlFile, tarFilePath):
+        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
+            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
+             'Scene Path','Scene Row','GroupName',row col bands format pixelType size sacle '''
+        xx = ElementTree.parse(xmlFile)
+        metaInfo=range(0,23)
+        metaInfo[0]=xx.find("ProductLevel").text
+        metaInfo[1]=xx.find("SatelliteID").text
+        metaInfo[2]=xx.find("SensorID").text
+        metaInfo[3]=xx.find("ReceiveTime").text
+        metaInfo[4]=xx.find("OrbitID").text
+        metaInfo[5]=xx.find("SolarZenith").text
+        metaInfo[6]=xx.find("SolarAzimuth").text
+        metaInfo[7]=xx.find("SatelliteAzimuth").text
+        metaInfo[8]=xx.find("SatelliteZenith").text
+        metaInfo[9]=xx.find("CloudPercent").text
+        metaInfo[10]=None
+        metaInfo[11]="Compressed"
+        metaInfo[12]=tarFilePath
+        metaInfo[13]=xx.find("ScenePath").text
+        metaInfo[14]=xx.find("SceneRow").text
+        metaInfo[15]=""
+        metaInfo[16]=xx.find("HeightInPixels").text
+        metaInfo[17]=xx.find("WidthInPixels").text
+        metaInfo[18]=xx.find("Bands").text
+        metaInfo[19]='GEOTIFF'
+        metaInfo[20]= 'unknow' #xx.find("PixelByte").text
+        metaInfo[21]=os.path.getsize(tarFilePath)
+        metaInfo[22]= 0 #(float(xx.find("ImageGSD").find("Line").text)+float(xx.find("ImageGSD").find("Sample").text))/2.0
+        return metaInfo
     def getZY3PointInfo(xmlFile):
         root = ElementTree.parse(xmlFile)
         xx=root.find("productInfo").find("ProductGeographicRange")
@@ -91,7 +175,7 @@ if __name__ == "__main__":
         metaInfo[7]=xx.find("SatAltitude").text
         metaInfo[8]=xx.find("SatAzimuth").text
         metaInfo[9]=xx.find("CloudPercent").text
-        metaInfo[10]=None
+        metaInfo[10]= None
         metaInfo[11]="Compressed"
         metaInfo[12]=tarFilePath
         metaInfo[13]=xx.find("ScenePath").text
@@ -227,69 +311,81 @@ if __name__ == "__main__":
             if "GF2" in filename:
                 unTarFolderName = filename[0:-7]
                 unTarFolderPath = targetRoot + os.sep + "GF2" + os.sep + unTarFolderName
+                isMatch= False
                 try:
                     with tarfile.TarFile.open(packagePath, 'r') as tars:
                         for tarInfo in tars:
-                            ##############################高分二号###################################
+                            isMatch= True
                             if "MSS1.xml" in tarInfo.name:
                                 data = tarInfo.name
-                                # #判断是否存在该文件夹，如不存在则新建
-                                # if not os.path.exists(rootFolder):
-                                # 	os.makedirs(rootFolder)
                                 tars.extract(tarInfo, unTarFolderPath)
-                                xmlFilePath = os.path.join(unTarFolderPath, tarInfo.name)
-                                getTagText(xmlFilePath, "SatelliteID")
                             if "MSS1.jpg" in tarInfo.name:
                                 tars.extract(tarInfo, unTarFolderPath)
                                 jpgFileName = tarInfo.name
-                            #对图像进行worldfile文件导出需要用到rpb和tiff文件
-                            if "PAN1.rpb" in tarInfo.name:
+                            if "PAN1.xml" in tarInfo.name:
+                                data = tarInfo.name
                                 tars.extract(tarInfo, unTarFolderPath)
-                            if "PAN1.tiff" in tarInfo.name:
-                                printDialog("当前处理的TIFF文件名为" + tarInfo.name)
+                            if "PAN1.jpg" in tarInfo.name:
                                 tars.extract(tarInfo, unTarFolderPath)
-                                panTiffPath = os.path.join(unTarFolderPath, tarInfo.name)
-                                printDialog(u"now processing " + tarInfo.name + "\'s WorldFile")
-                                getRasterWorldFileInfo(panTiffPath)
-                                panTfwxOriginaName = os.path.join(unTarFolderPath, tarInfo.name[0:-4] + "tfwx")
-                                MSSJpgwFileName = panTfwxOriginaName[0:-9] + "MSS1.jgw"
-                                MSSJpgwFile = os.rename(panTfwxOriginaName, MSSJpgwFileName)
+                                jpgFileName = tarInfo.name
                 except Exception, e:
                     printDialog(e)
-                deleteFilesByExtention([".rpb", ".tiff"], unTarFolderPath)
+                deleteFilesByExtention([".rpb", ".tiff", ".aux.xml"], unTarFolderPath)
+                if isMatch:
+                    #MSS1
+                    pointInfo=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.xml")
+                    img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.jpg")
+                    jpgWidth=img.size[0]
+                    jpgHight=img.size[1]
+                    calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"-MSS1.jpw")
+                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.xml",packagePath))
+                    #PAN1
+                    pointInfo1=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.xml")
+                    img1 = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.jpg")
+                    jpgWidth1=img1.size[0]
+                    jpgHight1=img1.size[1]
+                    calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN1.jpw")
+                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.xml",packagePath))
             if "GF1" in filename:
                 unTarFolderName = filename[0:-7]
                 unTarFolderPath = targetRoot + os.sep + "GF1" + os.sep + unTarFolderName
+                isMatch= False
                 try:
                     with tarfile.TarFile.open(packagePath, 'r') as tars:
                         for tarInfo in tars:
-                            ##############################高分一号###################################
+                            isMatch= True
                             if "MSS2.xml" in tarInfo.name:
                                 data = tarInfo.name
-                                # #判断是否存在该文件夹，如不存在则新建
-                                # if not os.path.exists(rootFolder):
-                                # 	os.makedirs(rootFolder)
                                 tars.extract(tarInfo, unTarFolderPath)
                                 xmlFilePath = os.path.join(unTarFolderPath, tarInfo.name)
-                                getTagText(xmlFilePath, "SatelliteID")
                             if "MSS2.jpg" in tarInfo.name:
                                 tars.extract(tarInfo, unTarFolderPath)
                                 jpgFileName = tarInfo.name
-                            #对图像进行worldfile文件导出需要用到rpb和tiff文件
-                            if "PAN2.rpb" in tarInfo.name:
+                            if "PAN2.xml" in tarInfo.name:
+                                data = tarInfo.name
                                 tars.extract(tarInfo, unTarFolderPath)
-                            if "PAN2.tiff" in tarInfo.name:
-                                printDialog(u"当前处理的TIFF文件名为" + tarInfo.name)
+                                xmlFilePath = os.path.join(unTarFolderPath, tarInfo.name)
+                            if "PAN2.jpg" in tarInfo.name:
                                 tars.extract(tarInfo, unTarFolderPath)
-                                panTiffPath = os.path.join(unTarFolderPath, tarInfo.name)
-                                printDialog(u"正在处理" + tarInfo.name + "\'s WorldFile")
-                                getRasterWorldFileInfo(panTiffPath)
-                                panTfwxOriginaName = os.path.join(unTarFolderPath, tarInfo.name[0:-4] + "tfwx")
-                                MSSJpgwFileName = panTfwxOriginaName[0:-9] + "MSS2.jgw"
-                                MSSJpgwFile = os.rename(panTfwxOriginaName, MSSJpgwFileName)
+                                jpgFileName = tarInfo.name
                 except Exception, e:
                     printDialog(e)
                 deleteFilesByExtention([".rpb", ".tiff"], unTarFolderPath)
+                if isMatch:
+                    #MSS2
+                    pointInfo=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.xml")
+                    img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.jpg")
+                    jpgWidth=img.size[0]
+                    jpgHight=img.size[1]
+                    calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"-MSS2.jpw")
+                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.xml",packagePath))
+                    #PAN2
+                    pointInfo1=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.xml")
+                    img1 = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpg")
+                    jpgWidth1=img1.size[0]
+                    jpgHight1=img1.size[1]
+                    calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpw")
+                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.xml",packagePath))
             if "!SPOT6" in filename:
                 printDialog(u"正在处理" + filename + u"数据")
                 unTarFolderName = filename[0:-4]
