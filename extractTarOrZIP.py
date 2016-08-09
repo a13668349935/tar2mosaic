@@ -18,7 +18,7 @@ if __name__ == "__main__":
     #imageFolder = "extract_gf_metadata.in"										#**
     rootFolder = r"F:\Temp\Data\GF1"  #存放压缩文件的根目录							#**
     targetRoot = r"F:\Temp\extract_gf_metadata.out"  #输出解压后的跟目录				#**
-    resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\test"
+    resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\GF"
     #******************************************************************************
 
 
