@@ -16,9 +16,9 @@ if __name__ == "__main__":
     # ******************************************************************************
     # basicPath= r"F:\Temp"														#**
     #imageFolder = "extract_gf_metadata.in"										#**
-    rootFolder = r"F:\Temp\Data\GF1"  #存放压缩文件的根目录							#**
+    rootFolder = r"F:\Temp\Data"  #存放压缩文件的根目录							#**
     targetRoot = r"F:\Temp\extract_gf_metadata.out"  #输出解压后的跟目录				#**
-    resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\test"
+    resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\GF"
     #******************************************************************************
 
 
@@ -95,9 +95,9 @@ if __name__ == "__main__":
         metaInfo[17]=xx.find("WidthInPixels").text
         metaInfo[18]=xx.find("Bands").text
         metaInfo[19]='GEOTIFF'
-        metaInfo[20]= 'unknow' #xx.find("PixelByte").text
+        metaInfo[20]= xx.find("PixelBits").text
         metaInfo[21]=os.path.getsize(tarFilePath)
-        metaInfo[22]= 0 #(float(xx.find("ImageGSD").find("Line").text)+float(xx.find("ImageGSD").find("Sample").text))/2.0
+        metaInfo[22]= float(xx.find("ImageGSD"))
         return metaInfo
     def getGF2PointInfo(xmlFile):
         root= ElementTree.parse(xmlFile)
@@ -137,9 +137,9 @@ if __name__ == "__main__":
         metaInfo[17]=xx.find("WidthInPixels").text
         metaInfo[18]=xx.find("Bands").text
         metaInfo[19]='GEOTIFF'
-        metaInfo[20]= 'unknow' #xx.find("PixelByte").text
+        metaInfo[20]= xx.find("PixelBits").text
         metaInfo[21]=os.path.getsize(tarFilePath)
-        metaInfo[22]= 0 #(float(xx.find("ImageGSD").find("Line").text)+float(xx.find("ImageGSD").find("Sample").text))/2.0
+        metaInfo[22]= float(xx.find("ImageGSD").text)
         return metaInfo
     def getZY3PointInfo(xmlFile):
         root = ElementTree.parse(xmlFile)
@@ -444,22 +444,53 @@ if __name__ == "__main__":
                     with tarfile.TarFile.open(packagePath, 'r') as tars:
                         for tarInfo in tars:
                             isMatch=True
-                            ##############################zy3###################################
-                            if unTarFolderName+".xml" == tarInfo.name:
-                                tars.extract(tarInfo, unTarFolderPath)
-                            if unTarFolderName+".jpg" == tarInfo.name:
-                                tars.extract(tarInfo, unTarFolderPath)
-                                jpgFileName = tarInfo.name
-
+                            if "HRC" in tarInfo.name:
+                                if unTarFolderName+".xml" == tarInfo.name:
+                                    data = tarInfo.name
+                                    tars.extract(tarInfo, unTarFolderPath)
+                                if unTarFolderName+".jpg" == tarInfo.name:
+                                    tars.extract(tarInfo, unTarFolderPath)
+                                    jpgFileName = tarInfo.name
+                            if "PMS" in tarInfo.name:
+                                if "MUX" in tarInfo.name:
+                                    if unTarFolderName+"-MUX.xml" == tarInfo.name:
+                                        data = tarInfo.name
+                                        tars.extract(tarInfo, unTarFolderPath)
+                                    if unTarFolderName+"-MUX.jpg" == tarInfo.name:
+                                        tars.extract(tarInfo, unTarFolderPath)
+                                        jpgFileName = tarInfo.name
+                                if "PAN" in tarInfo.name:
+                                    if unTarFolderName+"-PAN.xml" == tarInfo.name:
+                                        data = tarInfo.name
+                                        tars.extract(tarInfo, unTarFolderPath)
+                                    if unTarFolderName+"-PAN.jpg" == tarInfo.name:
+                                        tars.extract(tarInfo, unTarFolderPath)
+                                        jpgFileName = tarInfo.name
                 except Exception, e:
                     printDialog(e)
                 if isMatch:
-                    pointInfo=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+".xml")
-                    img = Image.open(unTarFolderPath+os.sep+unTarFolderName+".jpg")
-                    jpgWidth=img.size[0]
-                    jpgHight=img.size[1]
-                    calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+".jpw")
-                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+".jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+".xml",packagePath))
+                    if "HRC" in unTarFolderName:
+                        pointInfo=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+".xml")
+                        img = Image.open(unTarFolderPath+os.sep+unTarFolderName+".jpg")
+                        jpgWidth=img.size[0]
+                        jpgHight=img.size[1]
+                        calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+".jpw")
+                        addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+".jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+".xml",packagePath))
+                    elif "PMS" in unTarFolderName:
+                        pointInfo=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+"-MUX.xml")
+                        img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-MUX.jpg")
+                        jpgWidth=img.size[0]
+                        jpgHight=img.size[1]
+                        calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"-MUX.jpw")
+                        addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-MUX.jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-MUX.xml",packagePath))
+                        pointInfo1=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN.xml")
+                        img1 = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-PAN.jpg")
+                        jpgWidth1=img1.size[0]
+                        jpgHight1=img1.size[1]
+                        calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN.jpw")
+                        addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN.jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN.xml",packagePath))
+                    else:
+                        printDialog(u"资源系列未知类型！！")
             if "zy3" in filename:
                 unTarFolderName = filename[0:-4]
                 unTarFolderPath = targetRoot + os.sep + "ZY3" + os.sep + unTarFolderName
