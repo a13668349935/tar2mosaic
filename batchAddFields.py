@@ -23,5 +23,6 @@ print("fieldLength length:" + str(len(fieldLength)))
 
 for index,value in enumerate(fieldName):
 	print('add field'+ " "+ value)
-	arcpy.AddField_management(mosaicDataSetName,value,'','',fieldLength[index])
+	arcpy.AddField_management(mosaicDataSetName,value,fieldType[index],'','',fieldLength[index])
+	arcpy.AddField_management("GF",'SensorName','TEXT','','',50)
 print('finish')
