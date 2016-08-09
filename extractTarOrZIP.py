@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # ******************************************************************************
     # basicPath= r"F:\Temp"														#**
     #imageFolder = "extract_gf_metadata.in"										#**
-    rootFolder = r"F:\Temp\Data"  #存放压缩文件的根目录							#**
+    rootFolder = r"F:\Temp\Data\SPOT6"  #存放压缩文件的根目录							#**
     targetRoot = r"F:\Temp\extract_gf_metadata.out"  #输出解压后的跟目录				#**
     resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\GF"
     #******************************************************************************
@@ -94,7 +94,7 @@ if __name__ == "__main__":
         metaInfo[16]=xx.find("HeightInPixels").text
         metaInfo[17]=xx.find("WidthInPixels").text
         metaInfo[18]=xx.find("Bands").text
-        metaInfo[19]='GEOTIFF'
+        metaInfo[19]=xx.find("ProductFormat").text
         metaInfo[20]= xx.find("PixelBits").text
         metaInfo[21]=os.path.getsize(tarFilePath)
         metaInfo[22]= float(xx.find("ImageGSD"))
@@ -136,10 +136,89 @@ if __name__ == "__main__":
         metaInfo[16]=xx.find("HeightInPixels").text
         metaInfo[17]=xx.find("WidthInPixels").text
         metaInfo[18]=xx.find("Bands").text
-        metaInfo[19]='GEOTIFF'
+        metaInfo[19]=xx.find("ProductFormat").text
         metaInfo[20]= xx.find("PixelBits").text
         metaInfo[21]=os.path.getsize(tarFilePath)
         metaInfo[22]= float(xx.find("ImageGSD").text)
+        return metaInfo
+    def getSPOT6PointInfo(xmlFile):
+        xmlStruct= ElementTree.parse(xmlFile)
+        pointInfo= range(0,8)
+        root= xmlStruct.getroot()
+        pointsStruct=root.find("Dataset_Content").find("Dataset_Extent")
+        points= pointsStruct.findall('Vertex')
+        pointInfo[0]=float(points[0].find("LON").text)
+        pointInfo[1]=float(points[0].find("LAT").text)
+        pointInfo[2]=float(points[1].find("LON").text)
+        pointInfo[3]=float(points[1].find("LAT").text)
+        pointInfo[4]=float(points[2].find("LON").text)
+        pointInfo[5]=float(points[2].find("LAT").text)
+        pointInfo[6]=float(points[3].find("LON").text)
+        pointInfo[7]=float(points[3].find("LAT").text)
+        return pointInfo
+    def getSPOT6MSMetaInfo(xmlFile, tarFilePath):
+        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
+            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
+             'Scene Path','Scene Row','GroupName',row, col, bands, format, pixelType, size, sacle '''
+        xx = ElementTree.parse(xmlFile)
+        metaInfo=range(0,23)
+        metaInfo[0]=''
+        metaInfo[1]=xx.find("Dataset_Sources").find("Source_Identification").find("SOURCE_DESCRIPTION").text
+        metaInfo[2]=xx.find("Dataset_Sources").find("Source_Identification").find("Strip_Source").find("BAND_MODE").text
+        metaInfo[3]=(xx.find("Dataset_Sources").find("Source_Identification").find("Strip_Source").find("IMAGING_DATE").text+\
+                    " "+xx.find("Dataset_Sources").find("Source_Identification").find("Strip_Source").find("IMAGING_TIME").text).replace("-","/")[0:19]
+
+        metaInfo[4]=""
+        metaInfo[5]=float(xx.find("Geometric_Data").find("Use_Area").find("Located_Geometric_Values").find("Solar_Incidences").find("SUN_ELEVATION").text)
+        metaInfo[6]=float(xx.find("Geometric_Data").find("Use_Area").find("Located_Geometric_Values").find("Solar_Incidences").find("SUN_AZIMUTH").text)
+        metaInfo[7]=None
+        metaInfo[8]=None
+        metaInfo[9]=None
+        metaInfo[10]=xx.find("Geometric_Data").find("Use_Area").find("Located_Geometric_Values").find("Acquisition_Angles").find("VIEWING_ANGLE").text
+        metaInfo[11]="Compressed"
+        metaInfo[12]=tarFilePath
+        metaInfo[13]=None
+        metaInfo[14]=None
+        metaInfo[15]=""
+        metaInfo[16]=float(xx.find("Raster_Data").find("Raster_Dimensions").find("NROWS").text)
+        metaInfo[17]=float(xx.find("Raster_Data").find("Raster_Dimensions").find("NCOLS").text)
+        metaInfo[18]=float(xx.find("Raster_Data").find("Raster_Dimensions").find("NBANDS").text)
+        metaInfo[19]=xx.find("Dataset_Identification").find("DATASET_QL_FORMAT").text
+        metaInfo[20]=float(xx.find("Raster_Data").find("Raster_Encoding").find("NBITS").text)
+        metaInfo[21]=os.path.getsize(tarFilePath)
+        metaInfo[22]= 6
+        return metaInfo
+    def getSPOT6PMetaInfo(xmlFile, tarFilePath):
+        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
+            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
+             'Scene Path','Scene Row','GroupName',row, col, bands, format, pixelType, size, sacle '''
+        xx = ElementTree.parse(xmlFile)
+        metaInfo=range(0,23)
+        metaInfo[0]=''
+        metaInfo[1]=xx.find("Dataset_Sources").find("Source_Identification").find("SOURCE_DESCRIPTION").text
+        metaInfo[2]=xx.find("Dataset_Sources").find("Source_Identification").find("Strip_Source").find("BAND_MODE").text
+        metaInfo[3]=(xx.find("Dataset_Sources").find("Source_Identification").find("Strip_Source").find("IMAGING_DATE").text+ \
+                     " "+xx.find("Dataset_Sources").find("Source_Identification").find("Strip_Source").find("IMAGING_TIME").text).replace("-","/")[0:19]
+
+        metaInfo[4]=""
+        metaInfo[5]=float(xx.find("Geometric_Data").find("Use_Area").find("Located_Geometric_Values").find("Solar_Incidences").find("SUN_ELEVATION").text)
+        metaInfo[6]=float(xx.find("Geometric_Data").find("Use_Area").find("Located_Geometric_Values").find("Solar_Incidences").find("SUN_AZIMUTH").text)
+        metaInfo[7]=None
+        metaInfo[8]=None
+        metaInfo[9]=None
+        metaInfo[10]=xx.find("Geometric_Data").find("Use_Area").find("Located_Geometric_Values").find("Acquisition_Angles").find("VIEWING_ANGLE").text
+        metaInfo[11]="Compressed"
+        metaInfo[12]=tarFilePath
+        metaInfo[13]=None
+        metaInfo[14]=None
+        metaInfo[15]=""
+        metaInfo[16]=float(xx.find("Raster_Data").find("Raster_Dimensions").find("NROWS").text)
+        metaInfo[17]=float(xx.find("Raster_Data").find("Raster_Dimensions").find("NCOLS").text)
+        metaInfo[18]=float(xx.find("Raster_Data").find("Raster_Dimensions").find("NBANDS").text)
+        metaInfo[19]=xx.find("Dataset_Identification").find("DATASET_QL_FORMAT").text
+        metaInfo[20]=float(xx.find("Raster_Data").find("Raster_Encoding").find("NBITS").text)
+        metaInfo[21]=os.path.getsize(tarFilePath)
+        metaInfo[22]= 6
         return metaInfo
     def getZY3PointInfo(xmlFile):
         root = ElementTree.parse(xmlFile)
@@ -226,7 +305,7 @@ if __name__ == "__main__":
         metaInfo[16]=xx.find("HeightInPixels").text
         metaInfo[17]=xx.find("WidthInPixels").text
         metaInfo[18]=xx.find("Bands").text
-        metaInfo[19]='GEOTIFF'
+        metaInfo[19]=xx.find("ProductFormat").text
         metaInfo[20]=xx.find("PixelBits").text
         metaInfo[21]=os.path.getsize(tarFilePath)
         metaInfo[22]=xx.find("ImageGSD").text
@@ -386,14 +465,16 @@ if __name__ == "__main__":
                     jpgHight1=img1.size[1]
                     calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpw")
                     addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.xml",packagePath))
-            if "!SPOT6" in filename:
+            if "SPOT6" in filename:
                 printDialog(u"正在处理" + filename + u"数据")
                 unTarFolderName = filename[0:-4]
                 unTarFolderPath = targetRoot + os.sep + "SPOT6" + os.sep + unTarFolderName
                 zipFileName = ""
+                isMatch= False
                 try:
                     with zipfile.ZipFile(packagePath, "r") as zips:
                         for zipfile in zips.filelist:
+                            isMatch=True
                             zipFileName = zipfile.filename
                             if "SPOT6_MS" in zipFileName:
                                 printDialog(u"处理全色影像" + zipFileName)
@@ -407,9 +488,9 @@ if __name__ == "__main__":
                                     printDialog(u"正在解压" + zipFileName + u"文件")
                                     zips.extract(zipFileName, unTarFolderPath)
                                 #IMG_SPOT6_MS_201501250304475_SEN_1311812101_R1C1.J2W
-                                if "SPOT6_MS" in zipFileName and ".J2W" in zipFileName:
-                                    printDialog(u"正在解压" + zipFileName + u"文件")
-                                    zips.extract(zipFileName, unTarFolderPath)
+                                # if "SPOT6_MS" in zipFileName and ".J2W" in zipFileName:
+                                #     printDialog(u"正在解压" + zipFileName + u"文件")
+                                #     zips.extract(zipFileName, unTarFolderPath)
                                 # msFolderPath= os.path.join(parent+ os.sep+ dirnames, zipfile.filename)
                                 # moveFileDeleteFolders(msFolderPath, unTarFolderPath)
                             #处理全色影像
@@ -423,19 +504,42 @@ if __name__ == "__main__":
                                     printDialog(u"正在解压" + zipFileName + u"文件")
                                     zips.extract(zipFileName, unTarFolderPath)
                                     pJPG = zipFileName
-                                if "SPOT6_P" in zipFileName and ".J2W" in zipFileName:
-                                    printDialog(u"正在解压" + zipFileName + u"文件")
-                                    zips.extract(zipFileName, unTarFolderPath)
+                                # if "SPOT6_P" in zipFileName and ".J2W" in zipFileName:
+                                #     printDialog(u"正在解压" + zipFileName + u"文件")
+                                #     zips.extract(zipFileName, unTarFolderPath)
                                 #改名坐标文件
                                 # J2WOriginaName= os.path.join(unTarFolderPath, zipFileName.name[0:-3]+"J2W")
                                 # J2WTargetName= J2WOriginaName[0:-9]+"MSS2.jgw"
                                 # MSSJpgwFile= os.rename(panTfwxOriginaName, MSSJpgwFileName)
 
-
                 except Exception, e:
                     printDialog(e)
-                zipExtractPath = zipFileName[0:-3]
-                moveFileDeleteFolders(zipExtractPath, zipExtractPath)
+                #zipExtractPath = zipFileName[0:-3]
+                moveFileDeleteFolders(unTarFolderPath, unTarFolderPath)
+                if isMatch:
+                    spot6UntarFolderPath= os.path.join(targetRoot, "SPOT6"+os.sep+ unTarFolderName)
+                    for pa, dirs, fns in os.walk(spot6UntarFolderPath):
+                        for fn in fns:
+                            if "PREVIEW_SPOT6_MS" in fn and "JPG" in fn:
+                                xmlFilePath=os.path.join(targetRoot,"SPOT6"+os.sep+ unTarFolderName+os.sep+ "DIM"+fn[7:-3]+"XML")
+                                printDialog(xmlFilePath)
+                                pointInfo= getSPOT6PointInfo(xmlFilePath)
+                                img = Image.open(unTarFolderPath+ os.sep+fn)
+                                jpgWidth=img.size[0]
+                                jpgHight=img.size[1]
+                                calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+"PREVIEW"+fn[7:-3]+"jpw")
+                                addJPG2Mosaic(unTarFolderPath+ os.sep+fn,getSPOT6MSMetaInfo(xmlFilePath,packagePath))
+                            elif "PREVIEW_SPOT6_P" in fn and "JPG" in fn:
+                                xxmlFilePath=os.path.join(targetRoot,"SPOT6"+os.sep+ unTarFolderName+os.sep+ "DIM"+fn[7:-3]+"XML")
+                                printDialog(xmlFilePath)
+                                pointInfo= getSPOT6PointInfo(xmlFilePath)
+                                img = Image.open(unTarFolderPath+ os.sep+fn)
+                                jpgWidth=img.size[0]
+                                jpgHight=img.size[1]
+                                calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+"PREVIEW"+fn[7:-3]+"jpw")
+                                addJPG2Mosaic(unTarFolderPath+ os.sep+fn,getSPOT6PMetaInfo(xmlFilePath,packagePath))
+                            else:
+                                printDialog(u"xml文件处理！！")
             if "ZY02C" in filename:
                 unTarFolderName = filename[0:-7]
                 unTarFolderPath = targetRoot + os.sep + "ZY02C" + os.sep + unTarFolderName
@@ -515,4 +619,4 @@ if __name__ == "__main__":
                     metaInfo=getZY3MetaInfo(unTarFolderPath+os.sep+unTarFolderName+".xml",packagePath)
                     calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"_pre.jpw")
                     addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"_pre.jpg",metaInfo)
-    print(u"finshed")
+    printDialog(u"finshed")
