@@ -12,24 +12,17 @@ if __name__ == "__main__":
     import xml.dom.minidom as xmlDom
     from xml.etree import ElementTree
     import arcpy
-    from PIL import Image
     # ******************************************************************************
     # basicPath= r"F:\Temp"														#**
     #imageFolder = "extract_gf_metadata.in"										#**
-    rootFolder = r"F:\Temp\Data\SPOT6"  #存放压缩文件的根目录							#**
-    targetRoot = r"F:\Temp\extract_gf_metadata.out"  #输出解压后的跟目录				#**
-    resultMosiac = r"C:\Users\zhongren\Desktop\Temp\test.gdb\GF"
-    #******************************************************************************
-
-
-
-    #输出对话框
+    rootFolder = arcpy.GetParameterAsText(0)
+    targetRoot = arcpy.GetParameterAsText(1)
+    resultMosiac = arcpy.GetParameterAsText(2)
     def printDialog(message):
-        print(message)
+        arcpy.AddMessage(message)
 
-    #遍历
-    printDialog("开始查找文件夹中的tar.gz文件")
-    #获取worldfield数据集路径
+    #printDialog("开始查找文件夹中的tar.gz文件")
+
     def getRasterWorldFileInfo(imagePaht):
         arcpy.ExportRasterWorldFile_management(imagePaht)
 
@@ -57,90 +50,6 @@ if __name__ == "__main__":
         rasterInfo[6]=raster.meanCellWidth
         rasterInfo[7]=raster.meanCellHeight
         return rasterInfo
-    def getGF1PointInfo(xmlFile):
-        root= ElementTree.parse(xmlFile)
-        pointInfo= range(0,8)
-        pointInfo[0]=float(root.find("TopLeftLongitude").text)
-        pointInfo[1]=float(root.find("TopLeftLatitude").text)
-        pointInfo[2]=float(root.find("TopRightLongitude").text)
-        pointInfo[3]=float(root.find("TopRightLatitude").text)
-        pointInfo[4]=float(root.find("BottomLeftLongitude").text)
-        pointInfo[5]=float(root.find("BottomLeftLatitude").text)
-        pointInfo[6]=float(root.find("BottomRightLongitude").text)
-        pointInfo[7]=float(root.find("BottomRightLatitude").text)
-        return pointInfo
-    def getGF1MetaInfo(xmlFile, tarFilePath):
-        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
-            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
-             'Scene Path','Scene Row','GroupName',row col bands format pixelType size sacle '''
-        xx = ElementTree.parse(xmlFile)
-        metaInfo=range(0,23)
-        metaInfo[0]=xx.find("ProductLevel").text
-        metaInfo[1]=xx.find("SatelliteID").text
-        metaInfo[2]=xx.find("SensorID").text
-        metaInfo[3]=xx.find("ReceiveTime").text
-        metaInfo[4]=xx.find("OrbitID").text
-        metaInfo[5]=xx.find("SolarZenith").text
-        metaInfo[6]=xx.find("SolarAzimuth").text
-        metaInfo[7]=xx.find("SatelliteAzimuth").text
-        metaInfo[8]=xx.find("SatelliteZenith").text
-        metaInfo[9]=xx.find("CloudPercent").text
-        metaInfo[10]=None
-        metaInfo[11]="Compressed"
-        metaInfo[12]=tarFilePath
-        metaInfo[13]=xx.find("ScenePath").text
-        metaInfo[14]=xx.find("SceneRow").text
-        metaInfo[15]=""
-        metaInfo[16]=xx.find("HeightInPixels").text
-        metaInfo[17]=xx.find("WidthInPixels").text
-        metaInfo[18]=xx.find("Bands").text
-        metaInfo[19]=xx.find("ProductFormat").text
-        metaInfo[20]= xx.find("PixelBits").text
-        metaInfo[21]=os.path.getsize(tarFilePath)
-        metaInfo[22]= float(xx.find("ImageGSD"))
-        return metaInfo
-    def getGF2PointInfo(xmlFile):
-        root= ElementTree.parse(xmlFile)
-        pointInfo= range(0,8)
-        pointInfo[0]=float(root.find("TopLeftLongitude").text)
-        pointInfo[1]=float(root.find("TopLeftLatitude").text)
-        pointInfo[2]=float(root.find("TopRightLongitude").text)
-        pointInfo[3]=float(root.find("TopRightLatitude").text)
-        pointInfo[4]=float(root.find("BottomLeftLongitude").text)
-        pointInfo[5]=float(root.find("BottomLeftLatitude").text)
-        pointInfo[6]=float(root.find("BottomRightLongitude").text)
-        pointInfo[7]=float(root.find("BottomRightLatitude").text)
-        return pointInfo
-    def getGF2MetaInfo(xmlFile, tarFilePath):
-        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
-            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
-             'Scene Path','Scene Row','GroupName',row col bands format pixelType size sacle '''
-        xx = ElementTree.parse(xmlFile)
-        metaInfo=range(0,23)
-        metaInfo[0]=xx.find("ProductLevel").text
-        metaInfo[1]=xx.find("SatelliteID").text
-        metaInfo[2]=xx.find("SensorID").text
-        metaInfo[3]=xx.find("ReceiveTime").text
-        metaInfo[4]=xx.find("OrbitID").text
-        metaInfo[5]=xx.find("SolarZenith").text
-        metaInfo[6]=xx.find("SolarAzimuth").text
-        metaInfo[7]=xx.find("SatelliteAzimuth").text
-        metaInfo[8]=xx.find("SatelliteZenith").text
-        metaInfo[9]=xx.find("CloudPercent").text
-        metaInfo[10]=None
-        metaInfo[11]="Compressed"
-        metaInfo[12]=tarFilePath
-        metaInfo[13]=xx.find("ScenePath").text
-        metaInfo[14]=xx.find("SceneRow").text
-        metaInfo[15]=""
-        metaInfo[16]=xx.find("HeightInPixels").text
-        metaInfo[17]=xx.find("WidthInPixels").text
-        metaInfo[18]=xx.find("Bands").text
-        metaInfo[19]=xx.find("ProductFormat").text
-        metaInfo[20]= xx.find("PixelBits").text
-        metaInfo[21]=os.path.getsize(tarFilePath)
-        metaInfo[22]= float(xx.find("ImageGSD").text)
-        return metaInfo
     def getSPOT6PointInfo(xmlFile):
         xmlStruct= ElementTree.parse(xmlFile)
         pointInfo= range(0,8)
@@ -219,6 +128,90 @@ if __name__ == "__main__":
         metaInfo[20]=float(xx.find("Raster_Data").find("Raster_Encoding").find("NBITS").text)
         metaInfo[21]=os.path.getsize(tarFilePath)
         metaInfo[22]= 6
+        return metaInfo
+    def getGF1PointInfo(xmlFile):
+        root= ElementTree.parse(xmlFile)
+        pointInfo= range(0,8)
+        pointInfo[0]=float(root.find("TopLeftLongitude").text)
+        pointInfo[1]=float(root.find("TopLeftLatitude").text)
+        pointInfo[2]=float(root.find("TopRightLongitude").text)
+        pointInfo[3]=float(root.find("TopRightLatitude").text)
+        pointInfo[4]=float(root.find("BottomLeftLongitude").text)
+        pointInfo[5]=float(root.find("BottomLeftLatitude").text)
+        pointInfo[6]=float(root.find("BottomRightLongitude").text)
+        pointInfo[7]=float(root.find("BottomRightLatitude").text)
+        return pointInfo
+    def getGF1MetaInfo(xmlFile, tarFilePath):
+        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
+            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
+             'Scene Path','Scene Row','GroupName',row col bands format pixelType size sacle '''
+        xx = ElementTree.parse(xmlFile)
+        metaInfo=range(0,23)
+        metaInfo[0]=xx.find("ProductLevel").text
+        metaInfo[1]=xx.find("SatelliteID").text
+        metaInfo[2]=xx.find("SensorID").text
+        metaInfo[3]=xx.find("ReceiveTime").text
+        metaInfo[4]=xx.find("OrbitID").text
+        metaInfo[5]=xx.find("SolarZenith").text
+        metaInfo[6]=xx.find("SolarAzimuth").text
+        metaInfo[7]=xx.find("SatelliteAzimuth").text
+        metaInfo[8]=xx.find("SatelliteZenith").text
+        metaInfo[9]=xx.find("CloudPercent").text
+        metaInfo[10]=None
+        metaInfo[11]="Compressed"
+        metaInfo[12]=tarFilePath
+        metaInfo[13]=xx.find("ScenePath").text
+        metaInfo[14]=xx.find("SceneRow").text
+        metaInfo[15]=""
+        metaInfo[16]=xx.find("HeightInPixels").text
+        metaInfo[17]=xx.find("WidthInPixels").text
+        metaInfo[18]=xx.find("Bands").text
+        metaInfo[19]='GEOTIFF'
+        metaInfo[20]= xx.find("PixelBits").text
+        metaInfo[21]=os.path.getsize(tarFilePath)
+        metaInfo[22]= float(xx.find("ImageGSD"))
+        return metaInfo
+    def getGF2PointInfo(xmlFile):
+        root= ElementTree.parse(xmlFile)
+        pointInfo= range(0,8)
+        pointInfo[0]=float(root.find("TopLeftLongitude").text)
+        pointInfo[1]=float(root.find("TopLeftLatitude").text)
+        pointInfo[2]=float(root.find("TopRightLongitude").text)
+        pointInfo[3]=float(root.find("TopRightLatitude").text)
+        pointInfo[4]=float(root.find("BottomLeftLongitude").text)
+        pointInfo[5]=float(root.find("BottomLeftLatitude").text)
+        pointInfo[6]=float(root.find("BottomRightLongitude").text)
+        pointInfo[7]=float(root.find("BottomRightLatitude").text)
+        return pointInfo
+    def getGF2MetaInfo(xmlFile, tarFilePath):
+        '''ProductName','Sensor Name','Sensor ID','Acquisition Date','Orbit ID','Sun Elevation'
+            ,'Sun Azimuth','Satellite Elevation','Satellite Azimuth','Cloud Cover','OffNadir','Archive Type','Archive Path',
+             'Scene Path','Scene Row','GroupName',row col bands format pixelType size sacle '''
+        xx = ElementTree.parse(xmlFile)
+        metaInfo=range(0,23)
+        metaInfo[0]=xx.find("ProductLevel").text
+        metaInfo[1]=xx.find("SatelliteID").text
+        metaInfo[2]=xx.find("SensorID").text
+        metaInfo[3]=xx.find("ReceiveTime").text
+        metaInfo[4]=xx.find("OrbitID").text
+        metaInfo[5]=xx.find("SolarZenith").text
+        metaInfo[6]=xx.find("SolarAzimuth").text
+        metaInfo[7]=xx.find("SatelliteAzimuth").text
+        metaInfo[8]=xx.find("SatelliteZenith").text
+        metaInfo[9]=xx.find("CloudPercent").text
+        metaInfo[10]=None
+        metaInfo[11]="Compressed"
+        metaInfo[12]=tarFilePath
+        metaInfo[13]=xx.find("ScenePath").text
+        metaInfo[14]=xx.find("SceneRow").text
+        metaInfo[15]=""
+        metaInfo[16]=xx.find("HeightInPixels").text
+        metaInfo[17]=xx.find("WidthInPixels").text
+        metaInfo[18]=xx.find("Bands").text
+        metaInfo[19]='GEOTIFF'
+        metaInfo[20]= xx.find("PixelBits").text
+        metaInfo[21]=os.path.getsize(tarFilePath)
+        metaInfo[22]= float(xx.find("ImageGSD").text)
         return metaInfo
     def getZY3PointInfo(xmlFile):
         root = ElementTree.parse(xmlFile)
@@ -305,7 +298,7 @@ if __name__ == "__main__":
         metaInfo[16]=xx.find("HeightInPixels").text
         metaInfo[17]=xx.find("WidthInPixels").text
         metaInfo[18]=xx.find("Bands").text
-        metaInfo[19]=xx.find("ProductFormat").text
+        metaInfo[19]='GEOTIFF'
         metaInfo[20]=xx.find("PixelBits").text
         metaInfo[21]=os.path.getsize(tarFilePath)
         metaInfo[22]=xx.find("ImageGSD").text
@@ -329,30 +322,17 @@ if __name__ == "__main__":
         arcpy.AddMessage(queryStr)
         with arcpy.da.UpdateCursor(resultMosiac, fieldStatistics,queryStr) as cursor:
             row = cursor.next()
-            row[0] = metaInfo[0]
-            row[1] = metaInfo[1]
-            row[2] = metaInfo[2]
-            row[3] = metaInfo[3]
-            row[4] = metaInfo[4]
-            row[5] = metaInfo[5]
-            row[6] = metaInfo[6]
-            row[7] = metaInfo[7]
-            row[8] = metaInfo[8]
-            row[9] = metaInfo[9]
-            row[10] = metaInfo[10]
-            row[11] = metaInfo[11]
-            row[12] = metaInfo[12]
-            row[13] = metaInfo[13]
-            row[14] = metaInfo[14]
-            row[15] = metaInfo[15]
-            row[16] = metaInfo[16]
-            row[17] = metaInfo[17]
-            row[18] = metaInfo[18]
-            row[19] = metaInfo[19]
-            row[20] = metaInfo[20]
-            row[21] = metaInfo[21]
-            row[22] = metaInfo[22]
+            for i in range(0,23):
+                row[i]=metaInfo[i]
             cursor.updateRow(row)
+    #path=folder+preName
+    def doALL(path,tarFilePath,xmlName,jpgName,jpwName,pointFunc,metaFunc):
+        pointInfo=pointFunc(path+xmlName)
+        img = arcpy.Raster(path+jpgName)
+        jpgWidth=img.width
+        jpgHight=img.height
+        calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,path+jpwName)
+        addJPG2Mosaic(path+jpgName,metaFunc(path+xmlName,tarFilePath))
     def moveFileDeleteFolders(currentPath, targetPath):  #currentPath===targetPath在此项目中相等
         #拷贝数据到根目录
         for p, dirn, fn in os.walk(currentPath):
@@ -376,11 +356,8 @@ if __name__ == "__main__":
                     if arg in filename:
                         deleteFilePath = os.path.join(root, filename)
                         os.remove(deleteFilePath)
-
-    #处理压缩文件
     for parent, dirnames, filenames in os.walk(rootFolder):
         for filename in filenames:
-            printDialog("文件名为：" + filename)
             #tarPath = os.path.join(rootFolder, filename+ os.sep+ filename)
             packagePath = os.path.join(parent, filename)
             jpgFilePath = ""
@@ -412,19 +389,9 @@ if __name__ == "__main__":
                 deleteFilesByExtention([".rpb", ".tiff", ".aux.xml"], unTarFolderPath)
                 if isMatch:
                     #MSS1
-                    pointInfo=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.xml")
-                    img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.jpg")
-                    jpgWidth=img.size[0]
-                    jpgHight=img.size[1]
-                    calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"-MSS1.jpw")
-                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS1.xml",packagePath))
+                    doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,"-MSS1.xml","-MSS1.jpg","-MSS1.jpw",getGF2PointInfo,getGF2MetaInfo)
                     #PAN1
-                    pointInfo1=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.xml")
-                    img1 = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.jpg")
-                    jpgWidth1=img1.size[0]
-                    jpgHight1=img1.size[1]
-                    calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN1.jpw")
-                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN1.xml",packagePath))
+                    doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,"-PAN1.xml","-PAN1.jpg","-PAN1.jpw",getGF2PointInfo,getGF2MetaInfo)
             if "GF1" in filename:
                 unTarFolderName = filename[0:-7]
                 unTarFolderPath = targetRoot + os.sep + "GF1" + os.sep + unTarFolderName
@@ -452,19 +419,9 @@ if __name__ == "__main__":
                 deleteFilesByExtention([".rpb", ".tiff"], unTarFolderPath)
                 if isMatch:
                     #MSS2
-                    pointInfo=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.xml")
-                    img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.jpg")
-                    jpgWidth=img.size[0]
-                    jpgHight=img.size[1]
-                    calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"-MSS2.jpw")
-                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-MSS2.xml",packagePath))
+                    doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,"-MSS2.xml","-MSS2.jpg","-MSS2.jpw",getGF2PointInfo,getGF2MetaInfo)
                     #PAN2
-                    pointInfo1=getGF2PointInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.xml")
-                    img1 = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpg")
-                    jpgWidth1=img1.size[0]
-                    jpgHight1=img1.size[1]
-                    calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpw")
-                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.jpg",getGF2MetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN2.xml",packagePath))
+                    doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,"-PAN2.xml","-PAN2.jpg","-PAN2.jpw",getGF2PointInfo,getGF2MetaInfo)
             if "SPOT6" in filename:
                 printDialog(u"正在处理" + filename + u"数据")
                 unTarFolderName = filename[0:-4]
@@ -524,18 +481,18 @@ if __name__ == "__main__":
                                 xmlFilePath=os.path.join(targetRoot,"SPOT6"+os.sep+ unTarFolderName+os.sep+ "DIM"+fn[7:-3]+"XML")
                                 printDialog(xmlFilePath)
                                 pointInfo= getSPOT6PointInfo(xmlFilePath)
-                                img = Image.open(unTarFolderPath+ os.sep+fn)
-                                jpgWidth=img.size[0]
-                                jpgHight=img.size[1]
+                                img =arcpy.Raster(unTarFolderPath+ os.sep+fn)
+                                jpgWidth=img.width
+                                jpgHight=img.height
                                 calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+"PREVIEW"+fn[7:-3]+"jpw")
                                 addJPG2Mosaic(unTarFolderPath+ os.sep+fn,getSPOT6MSMetaInfo(xmlFilePath,packagePath))
                             elif "PREVIEW_SPOT6_P" in fn and "JPG" in fn:
                                 xxmlFilePath=os.path.join(targetRoot,"SPOT6"+os.sep+ unTarFolderName+os.sep+ "DIM"+fn[7:-3]+"XML")
                                 printDialog(xmlFilePath)
                                 pointInfo= getSPOT6PointInfo(xmlFilePath)
-                                img = Image.open(unTarFolderPath+ os.sep+fn)
-                                jpgWidth=img.size[0]
-                                jpgHight=img.size[1]
+                                img = arcpy.Raster(unTarFolderPath+ os.sep+fn)
+                                jpgWidth=img.width
+                                jpgHight=img.height
                                 calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+"PREVIEW"+fn[7:-3]+"jpw")
                                 addJPG2Mosaic(unTarFolderPath+ os.sep+fn,getSPOT6PMetaInfo(xmlFilePath,packagePath))
                             else:
@@ -574,25 +531,9 @@ if __name__ == "__main__":
                     printDialog(e)
                 if isMatch:
                     if "HRC" in unTarFolderName:
-                        pointInfo=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+".xml")
-                        img = Image.open(unTarFolderPath+os.sep+unTarFolderName+".jpg")
-                        jpgWidth=img.size[0]
-                        jpgHight=img.size[1]
-                        calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+".jpw")
-                        addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+".jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+".xml",packagePath))
+                        doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,".xml",".jpg",".jpw",getZY02CPointInfo,getZY02CMetaInfo)
                     elif "PMS" in unTarFolderName:
-                        pointInfo=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+"-MUX.xml")
-                        img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-MUX.jpg")
-                        jpgWidth=img.size[0]
-                        jpgHight=img.size[1]
-                        calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"-MUX.jpw")
-                        addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-MUX.jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-MUX.xml",packagePath))
-                        pointInfo1=getZY02CPointInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN.xml")
-                        img1 = Image.open(unTarFolderPath+os.sep+unTarFolderName+"-PAN.jpg")
-                        jpgWidth1=img1.size[0]
-                        jpgHight1=img1.size[1]
-                        calculateJPW(pointInfo1[0],pointInfo1[1],pointInfo1[2],pointInfo1[3],pointInfo1[4],pointInfo1[5],pointInfo1[6],pointInfo1[7],jpgWidth1,jpgHight1,unTarFolderPath+os.sep+unTarFolderName+"-PAN.jpw")
-                        addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"-PAN.jpg",getZY02CMetaInfo(unTarFolderPath+os.sep+unTarFolderName+"-PAN.xml",packagePath))
+                        doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,"-MUX.xml",".-MUXjpg","-MUX.jpw",getZY02CPointInfo,getZY02CMetaInfo)
                     else:
                         printDialog(u"资源系列未知类型！！")
             if "zy3" in filename:
@@ -612,11 +553,5 @@ if __name__ == "__main__":
                 except Exception, e:
                     printDialog(e)
                 if isMatch:
-                    pointInfo=getZY3PointInfo(unTarFolderPath+os.sep+unTarFolderName+".xml")
-                    img = Image.open(unTarFolderPath+os.sep+unTarFolderName+"_pre.jpg")
-                    jpgWidth=img.size[0]
-                    jpgHight=img.size[1]
-                    metaInfo=getZY3MetaInfo(unTarFolderPath+os.sep+unTarFolderName+".xml",packagePath)
-                    calculateJPW(pointInfo[0],pointInfo[1],pointInfo[2],pointInfo[3],pointInfo[4],pointInfo[5],pointInfo[6],pointInfo[7],jpgWidth,jpgHight,unTarFolderPath+os.sep+unTarFolderName+"_pre.jpw")
-                    addJPG2Mosaic(unTarFolderPath+os.sep+unTarFolderName+"_pre.jpg",metaInfo)
-    printDialog(u"finshed")
+                    doALL(unTarFolderPath+os.sep+unTarFolderName,packagePath,".xml","_pre.jpg","_pre.jpw",getZY3PointInfo,getZY3MetaInfo)
+    print(u"finshed")
